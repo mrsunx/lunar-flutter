@@ -15,6 +15,8 @@ class LiuYue {
 
   int getIndex() => _index;
 
+  LiuNian getLiuNian() => _liuNian;
+
   String getGanZhi() {
     int offset = 0;
     String yearGan = _liuNian.getGanZhi().substring(0, 1);
