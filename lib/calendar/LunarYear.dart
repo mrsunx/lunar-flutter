@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'Lunar.dart';
 import 'LunarMonth.dart';
 import 'NineStar.dart';
@@ -400,7 +402,9 @@ class LunarYear {
 
   static const List<int> YMC = [11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  static LunarYear? _cacheYear;
+  static const int _cacheCapacity = 128;
+  static final LinkedHashMap<int, LunarYear> _yearCache =
+      LinkedHashMap<int, LunarYear>();
 
   /// 农历年
   int _year = 0;
@@ -434,14 +438,18 @@ class LunarYear {
   }
 
   static LunarYear fromYear(int lunarYear) {
-    LunarYear y;
-    if (null == _cacheYear || _cacheYear!.getYear() != lunarYear) {
-      y = new LunarYear(lunarYear);
-      _cacheYear = y;
-    } else {
-      y = _cacheYear!;
+    LunarYear? year = _yearCache.remove(lunarYear);
+    if (null != year) {
+      _yearCache[lunarYear] = year;
+      return year;
     }
-    return y;
+
+    year = LunarYear(lunarYear);
+    _yearCache[lunarYear] = year;
+    if (_yearCache.length > _cacheCapacity) {
+      _yearCache.remove(_yearCache.keys.first);
+    }
+    return year;
   }
 
   void _compute() {
